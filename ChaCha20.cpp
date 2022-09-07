@@ -2,8 +2,8 @@
  * @Author: LinJiasheng
  * @Date: 2022-09-06 11:26:11
  * @LastEditors: LinJiasheng
- * @LastEditTime: 2022-09-07 21:54:52
- * @Description: 
+ * @LastEditTime: 2022-09-08 00:27:29
+ * @Description: ChaCha20加密算法
  * 
  * Copyright (c) 2022 by LinJiasheng, All Rights Reserved. 
  */
@@ -34,7 +34,6 @@ class ChaCha20
 {
 public:
     void encrypt(ifstream& text,ifstream& key,ofstream& output,uint32_t counter);
-    void decrypt(ifstream& text,ofstream& output,uint32_t counter=1);
     
 private:
     vector<uint32_t> matrix;
