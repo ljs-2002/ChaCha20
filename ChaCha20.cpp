@@ -157,44 +157,6 @@ void ChaCha20::encrypt(ifstream& text,ifstream& key,ofstream& output,uint32_t co
     return;
 }
 
-void ChaCha20::decrypt(ifstream& text,ofstream& output,uint32_t counter)
-{
-    vector<uint32_t> key_stream;
-    vector<uint32_t>& ptr_key=key_stream;
-    char buf[64]={'\0'};
-    
-    Matrix(text);
-    int cur=text.tellg();
-    text.seekg(0,ios::end);
-    int size=text.tellg();
-    size-=cur;
-    text.seekg(cur,ios::beg);
-
-    for(uint32_t i=0;i<(uint32_t)(size/64);i++)
-    {
-        text.read(buf,64);
-        KeyStream(counter+i,ptr_key);
-        for(int j=0;j<64;j++)
-        {
-            uint32_t a=buf[j] ^ key_stream[j];
-            output.write((char*)&a,1);
-        }
-        key_stream.clear();
-    } 
-    if(size%64!=0)
-    {
-        int i = size/64;
-        text.read(buf,size%64);
-        KeyStream(counter+i,ptr_key);
-        for(int j=0;j<size%64;j++)
-        {
-            uint32_t a=buf[j] ^ key_stream[j];
-            output.write((char*)&a,1);
-        }
-    }
-    return;
-}
-
 int main()
 {
     ChaCha20 cc;
