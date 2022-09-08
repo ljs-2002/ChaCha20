@@ -2,7 +2,7 @@
  * @Author: LinJiasheng
  * @Date: 2022-09-06 11:26:11
  * @LastEditors: LinJiasheng
- * @LastEditTime: 2022-09-08 00:53:18
+ * @LastEditTime: 2022-09-08 16:28:15
  * @Description: 
  * 
  * Copyright (c) 2022 by LinJiasheng, All Rights Reserved. 
@@ -32,10 +32,7 @@ uint32_t magic[]={
 class ChaCha20
 {
 public:
-    void encrypt_decrypt(ifstream& text,ifstream& key,ofstream& output,uint32_t counter,bool mod);
-    
-    #define _DE true
-    #define _EN false
+    void encrypt_decrypt(ifstream& text,fstream& key,ofstream& output,uint32_t counter);
     
 private:
     vector<uint32_t> matrix;
@@ -69,7 +66,7 @@ private:
         }
     }
     //init the matrix
-    void Matrix(ifstream& key_nonce_stream)
+    void Matrix(fstream& key_nonce_stream)
     {
         for(int i=0;i<4;i++){
             this->matrix.insert(this->matrix.end(),magic[i]);
@@ -110,37 +107,31 @@ private:
     }
 };
 
-void ChaCha20::encrypt_decrypt(ifstream& text,ifstream& key,ofstream& output,uint32_t counter,bool mod){
+void ChaCha20::encrypt_decrypt(ifstream& text,fstream& key,ofstream& output,uint32_t counter){
     vector<uint32_t> key_stream;
     vector<uint32_t>& ptr_key=key_stream;
     char buf[64]={'\0'};
     
     //build chachMatrix(key);
-    if(mod)
-        Matrix(text);
-    else
-        Matrix(key);
+    Matrix(key);
 
     //get file size
-    int cur=text.tellg();
     text.seekg(0,ios::end);
     int size=text.tellg();
-    size-=cur;
-    text.seekg(cur,ios::beg);
+    text.seekg(0,ios::beg);
     
-    if(!mod){
-        //insert key and nonce
-        for(int i=0;i<11;i++){
-            uint32_t a,b,c,d;
-            a=this->key_nonce[i]&0x000000ff;
-            b=(this->key_nonce[i]&0x0000ff00)>>8;
-            c=(this->key_nonce[i]&0x00ff0000)>>16;
-            d=(this->key_nonce[i]&0xff000000)>>24;
-            output.write((char*)&a,1);//write in binary
-            output.write((char*)&b,1);
-            output.write((char*)&c,1);
-            output.write((char*)&d,1);
-        }
+    
+    //insert key and nonce
+    for(int i=0;i<11;i++){
+        uint32_t a,b,c,d;
+        a=this->key_nonce[i]&0x000000ff;
+        b=(this->key_nonce[i]&0x0000ff00)>>8;
+        c=(this->key_nonce[i]&0x00ff0000)>>16;
+        d=(this->key_nonce[i]&0xff000000)>>24;
+        key.write((char*)&a,1);//write in binary
+        key.write((char*)&b,1);
+        key.write((char*)&c,1);
+        key.write((char*)&d,1);
     }
     
     for(uint32_t i=0;i<(uint32_t)(size/64);i++)
@@ -172,7 +163,8 @@ void ChaCha20::encrypt_decrypt(ifstream& text,ifstream& key,ofstream& output,uin
 int main()
 {
     ChaCha20 cc;
-    ifstream file,key;
+    ifstream file;
+    fstream key;
     ofstream out;
     ifstream file2;
     ofstream out2;
@@ -181,7 +173,7 @@ int main()
     //out.open("output.txt",ios::out|ios::binary);
     file2.open("output.txt",ios::in|ios::binary);
     out2.open("decrypt.txt",ios::out|ios::binary);
-    cc.encrypt_decrypt(file2,key,out2,1,_DE);
+    cc.encrypt_decrypt(file2,key,out2,1);
     //ChaCha20 cc2;
     //cc2.decrypt(file2,out2,1);
     file.close();
