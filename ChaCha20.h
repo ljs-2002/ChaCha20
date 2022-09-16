@@ -289,8 +289,3 @@ void ChaCha20::cmd_server(int argc, char *argv[])
     }
     printf("over, enjoy yourself :)\n");
 }
-int main(int argc,char *argv[]){
-    ChaCha20 cc;
-    cc.cmd_server(argc,argv);
-    return 0;
-}
